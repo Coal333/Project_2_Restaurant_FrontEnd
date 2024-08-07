@@ -3,23 +3,22 @@ import SeatList from "./SeatList";
 import "./App.css";
 
 const App = () => {
-  // 상태 관리
-  const [storeName, setStoreName] = useState(""); // 매장명 상태
-  const [seatCount, setSeatCount] = useState(0); // 총 좌석 수 상태
-  const [seatStatuses, setSeatStatuses] = useState({}); // 각 좌석의 상태를 관리하는 객체
-  const [isDirty, setIsDirty] = useState(false); // 변경사항 추적을 위한 상태
+  const [storeName, setStoreName] = useState("");
+  const [location, setLocation] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [seatCount, setSeatCount] = useState(0);
+  const [seatStatuses, setSeatStatuses] = useState({});
+  const [isDirty, setIsDirty] = useState(false);
 
-  // 좌석 수가 변경될 때마다 실행되는 효과
   useEffect(() => {
     const initialStatuses = {};
     for (let i = 1; i <= seatCount; i++) {
-      initialStatuses[i] = false; // 모든 좌석을 초기에 체크 해제 상태로 설정
+      initialStatuses[i] = false;
     }
     setSeatStatuses(initialStatuses);
-    setIsDirty(true); // 좌석 수가 변경되면 isDirty를 true로 설정
+    setIsDirty(true);
   }, [seatCount]);
 
-  // 좌석 수 입력 필드 변경 핸들러
   const handleInputChange = (e) => {
     const value = parseInt(e.target.value, 10);
     if (!isNaN(value)) {
@@ -28,19 +27,16 @@ const App = () => {
     }
   };
 
-  // 좌석 수 증가 핸들러
   const incrementSeatCount = () => {
     setSeatCount(prevCount => prevCount + 1);
     setIsDirty(true);
   };
 
-  // 좌석 수 감소 핸들러
   const decrementSeatCount = () => {
     setSeatCount(prevCount => prevCount > 0 ? prevCount - 1 : 0);
     setIsDirty(true);
   };
 
-  // 개별 좌석 상태 변경 핸들러
   const handleSeatStatusChange = (seatNumber, isChecked) => {
     setSeatStatuses(prevStatuses => ({
       ...prevStatuses,
@@ -49,32 +45,54 @@ const App = () => {
     setIsDirty(true);
   };
 
-  // 매장명 변경 핸들러
   const handleStoreNameChange = (e) => {
     setStoreName(e.target.value);
     setIsDirty(true);
   };
 
-  // 백엔드로 데이터 전송 함수
-  const sendDataToBackend = () => {
-    const dataToSend = { storeName, seatStatuses };
-    
-    // 콘솔에 전송될 데이터 출력
-    console.log("전송될 데이터:", dataToSend);
+  const handleLocationChange = (e) => {
+    setLocation(e.target.value);
+    setIsDirty(true);
+  };
 
-    fetch("/api/stores", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(dataToSend),
-    }).then(() => {
-      setIsDirty(false); // 데이터 전송 후 isDirty를 false로 설정
-      // alert("데이터가 성공적으로 전송되었습니다.");
-    }).catch(error => {
-      console.error("데이터 전송 중 오류 발생:", error);
-      alert("데이터 전송 중 오류가 발생했습니다.");
-    });
+  const handlePhoneNumberChange = (e) => {
+    setPhoneNumber(e.target.value);
+    setIsDirty(true);
+  };
+
+  const sendDataToBackend = async () => {
+    const dataToSend = {
+      storeName,
+      location,
+      phoneNumber,
+      seats: seatCount
+    };
+
+    console.log("데이터:", dataToSend);
+
+    try {
+      const response = await fetch("http://localhost:8080/api/stores", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error: ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log("응답:", result);
+
+      alert("성공");
+      setIsDirty(false);
+    } catch (error) {
+      console.error("실패", error);
+      alert("실패");
+    }
   };
 
   return (
@@ -87,7 +105,27 @@ const App = () => {
           id="storeName"
           value={storeName}
           onChange={handleStoreNameChange}
-          placeholder="매장명을 입력하세요"
+          placeholder="매장명"
+        />
+      </div>
+      <div className="location-input">
+        <label htmlFor="location">위치:</label>
+        <input
+          type="text"
+          id="location"
+          value={location}
+          onChange={handleLocationChange}
+          placeholder="위치"
+        />
+      </div>
+      <div className="phone-number-input">
+        <label htmlFor="phoneNumber">전화번호:</label>
+        <input
+          type="text"
+          id="phoneNumber"
+          value={phoneNumber}
+          onChange={handlePhoneNumberChange}
+          placeholder="전화번호"
         />
       </div>
       <div className="seat-input">

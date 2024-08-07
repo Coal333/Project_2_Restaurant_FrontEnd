@@ -39,6 +39,41 @@ h1 {
   border-radius: 4px;
 }
 
+
+.location-input {
+  margin: 20px 0;
+}
+
+.location-input label {
+  margin-right: 10px;
+}
+
+.location-input input {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+
+
+.phone-number-input {
+  margin: 20px 0;
+}
+
+.phone-number-input label {
+  margin-right: 10px;
+}
+
+.phone-number-input input {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+
+
 /* 좌석 수 입력 컨트롤 스타일 */
 .seat-input {
   display: flex;
